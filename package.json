@@ -1,0 +1,32 @@
+{
+    "name": "webgl-wrapper",
+    "version": "0.0.1",
+    "description": "A simple wrapper for WebGL",
+    "main": "dist/wglw.js",
+    "types": "@types/webgl-wrapper/index.d.ts",
+    "scripts": {
+        "build": "webpack --env.production --config webpack.config.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bokovhu/webgl-wrapper.git"
+    },
+    "keywords": [
+        "webgl"
+    ],
+    "author": "Botond János Kovács",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/bokovhu/webgl-wrapper/issues"
+    },
+    "homepage": "https://github.com/bokovhu/webgl-wrapper#readme",
+    "devDependencies": {
+        "ts-loader": "^6.2.1",
+        "typescript": "^3.8.3",
+        "webpack": "^4.42.0",
+        "webpack-cli": "^3.3.11"
+    },
+    "dependencies": {
+        "gl-matrix": "^3.2.1"
+    }
+}
