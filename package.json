@@ -5,7 +5,8 @@
     "main": "dist/wglw.js",
     "types": "@types/webgl-wrapper/index.d.ts",
     "scripts": {
-        "build": "webpack --env.production --config webpack.config.js"
+        "build": "webpack --env.production --config webpack.config.js",
+        "build-dev": "webpack --env.development --config webpack.config.js"
     },
     "repository": {
         "type": "git",

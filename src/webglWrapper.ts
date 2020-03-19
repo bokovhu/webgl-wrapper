@@ -6,13 +6,40 @@ import {
     MakeTextureOptions,
     Make2DTextureOptions,
     Make3DTextureOptions,
-    MakeSamplerOptions
+    MakeSamplerOptions,
+    DefaultFramebuffer,
+    MakeCubemapOptions,
+    Cubemap,
+    MakeRenderbufferOptions,
+    MakeFramebufferOptions
 } from "../@types/webgl-wrapper/index";
 import Shader from "./shader";
 import Program from "./program";
 import Mesh from "./mesh";
 import Texture from "./texture";
 import Sampler from "./sampler";
+import { Renderbuffer, Framebuffer } from "./framebuffer";
+
+class DefaultFramebufferImpl {
+    constructor(
+        private gl: WebGL2RenderingContext,
+        private canvas: HTMLCanvasElement
+    ) {}
+
+    get width(): number {
+        return this.canvas.width;
+    }
+    get height(): number {
+        return this.canvas.height;
+    }
+
+    applyViewport(): void {
+        this.gl.viewport(0, 0, this.width, this.height);
+    }
+    bind(target: GLenum = this.gl.FRAMEBUFFER) {
+        this.gl.bindFramebuffer(target, null);
+    }
+}
 
 export default class WebGLWrapper {
     private _onInit: InitFunction = null;
@@ -28,6 +55,8 @@ export default class WebGLWrapper {
     private resizeCanvasToFitWindow: boolean = true;
 
     private _enableExtensions: string[] = [];
+
+    private _defaultFramebuffer: DefaultFramebuffer = null;
 
     constructor(private canvasSelector: string, options?: WebGLWrapperOptions) {
         if (options) {
@@ -59,6 +88,9 @@ export default class WebGLWrapper {
     get glContext(): WebGL2RenderingContext {
         return this._glContext;
     }
+    get defaultFramebuffer(): DefaultFramebuffer {
+        return this._defaultFramebuffer;
+    }
 
     private resizeCanvas(): void {
         this.resolution = [
@@ -79,6 +111,11 @@ export default class WebGLWrapper {
         for (let ext in this._enableExtensions) {
             this._glContext.getExtension(ext);
         }
+
+        this._defaultFramebuffer = new DefaultFramebufferImpl(
+            this._glContext,
+            this._canvas
+        );
 
         this.resolution = [this._canvas.width, this._canvas.height];
 
@@ -230,5 +267,68 @@ export default class WebGLWrapper {
         samp.update();
 
         return samp;
+    }
+
+    makeCubemap(options: MakeCubemapOptions): Cubemap {
+        // TODO: Cubemap support
+        throw new Error("Cubemaps are not yet supported");
+    }
+
+    makeRenderbuffer(options: MakeRenderbufferOptions): Renderbuffer {
+        let rb = new Renderbuffer(
+            this._glContext,
+            options.width,
+            options.height,
+            options.internalFormat
+        );
+        rb.generateHandle();
+        rb.generateStorage();
+
+        return rb;
+    }
+
+    makeFramebuffer(options: MakeFramebufferOptions): Framebuffer {
+        let fb = new Framebuffer(
+            this._glContext,
+            options.width,
+            options.height
+        );
+
+        fb.generateHandle();
+
+        if (options.generatedRenderbuffers) {
+            if (
+                options.generatedRenderbuffers.generateDepthStencilRenderbuffer
+            ) {
+                let rb = this.makeRenderbuffer({
+                    width: options.width,
+                    height: options.height,
+                    internalFormat: this._glContext.DEPTH_STENCIL
+                });
+                fb.attachDepthStencilRenderbuffer(rb);
+            } else {
+                if (options.generatedRenderbuffers.generateDepthRenderbuffer) {
+                    let rb = this.makeRenderbuffer({
+                        width: options.width,
+                        height: options.height,
+                        internalFormat: this._glContext.DEPTH_COMPONENT16
+                    });
+                    fb.attachDepthRenderbuffer(rb);
+                }
+
+                if (
+                    options.generatedRenderbuffers.generateStencilRenderbuffer
+                ) {
+                    let rb = this.makeRenderbuffer({
+                        width: options.width,
+                        height: options.height,
+                        internalFormat: this._glContext.STENCIL_INDEX8
+                    });
+                    fb.attachStencilRenderbuffer(rb);
+                }
+            }
+        }
+
+        return fb;
     }
 }

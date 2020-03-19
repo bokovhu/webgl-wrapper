@@ -46,6 +46,14 @@ declare namespace WebGLWrapper {
     export type UniformInfoMapType = { [name: string]: WebGLActiveInfo };
     export type UniformSetterMapType = { [name: string]: UniformSetter<any> };
 
+    export type CubemapFaceID = "+x" | "-x" | "+y" | "-y" | "+z" | "-z";
+    export type CubemapStorageInitalizationMapType = {
+        [face: string]: boolean;
+    };
+    export type CubemapDataMapType<T extends ArrayBufferView> = {
+        [face: string]: T;
+    };
+
     export type VertexDataType = Float32Array;
     export type IndexDataType = Uint16Array | Uint32Array;
 
@@ -151,7 +159,7 @@ declare namespace WebGLWrapper {
         wrapR: GLenum;
     }
 
-    export interface Texture {
+    export interface Texture extends GLContextAware {
         handle: WebGLTexture;
         width: number;
         height: number;
@@ -176,7 +184,90 @@ declare namespace WebGLWrapper {
         delete(): void;
     }
 
-    export interface Sampler {
+    export interface Cubemap extends GLContextAware {
+        handle: WebGLTexture;
+        width: number;
+        height: number;
+        pixelFormat: PixelFormat;
+        samplingProperties: SamplingProperties;
+        handleGenerated: boolean;
+        isDeleted: boolean;
+        isStorageInitialized: CubemapStorageInitalizationMapType;
+
+        generateHandle(): void;
+        bind(unit: number): void;
+
+        uploadFaceFloat(
+            face: CubemapFaceID,
+            data: Float32Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceInt(
+            face: CubemapFaceID,
+            data: Int32Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceUnsignedInt(
+            face: CubemapFaceID,
+            data: Uint32Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceShort(
+            face: CubemapFaceID,
+            data: Int16Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceUnsignedShort(
+            face: CubemapFaceID,
+            data: Uint16Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceByte(
+            face: CubemapFaceID,
+            data: Int8Array,
+            format?: PixelFormat
+        ): void;
+        uploadFaceUnsignedByte(
+            face: CubemapFaceID,
+            data: Uint8Array,
+            format?: PixelFormat
+        ): void;
+
+        uploadFloat(
+            data: CubemapDataMapType<Float32Array>,
+            format?: PixelFormat
+        ): void;
+        uploadInt(
+            data: CubemapDataMapType<Int32Array>,
+            format?: PixelFormat
+        ): void;
+        uploadUnsignedInt(
+            data: CubemapDataMapType<Uint32Array>,
+            format?: PixelFormat
+        ): void;
+        uploadShort(
+            data: CubemapDataMapType<Int16Array>,
+            format?: PixelFormat
+        ): void;
+        uploadUnsignedShort(
+            data: CubemapDataMapType<Uint16Array>,
+            format?: PixelFormat
+        ): void;
+        uploadByte(
+            data: CubemapDataMapType<Int8Array>,
+            format?: PixelFormat
+        ): void;
+        uploadUnsignedByte(
+            data: CubemapDataMapType<Uint8Array>,
+            format?: PixelFormat
+        ): void;
+
+        createStorageForFace(face: CubemapFaceID): void;
+        createStorage(): void;
+        delete(): void;
+    }
+
+    export interface Sampler extends GLContextAware {
         handle: WebGLSampler;
         properties: SamplingProperties;
         handleGenerated: boolean;
@@ -187,6 +278,66 @@ declare namespace WebGLWrapper {
         bind(unit: number): void;
         update(samplingProperties?: SamplingProperties): void;
         delete(): void;
+    }
+
+    export interface Renderbuffer extends GLContextAware {
+        handle: WebGLRenderbuffer;
+        width: number;
+        height: number;
+        internalFormat: GLenum;
+        handleGenerated: boolean;
+        storageGenerated: boolean;
+        isDeleted: boolean;
+
+        generateHandle(): void;
+        bind(): void;
+        generateStorage(internalFormat?: GLenum): void;
+        delete(): void;
+    }
+
+    export interface Framebuffer extends GLContextAware {
+        handle: WebGLFramebuffer;
+        width: number;
+        height: number;
+
+        handleGenerated: boolean;
+        isComplete: boolean;
+        isDeleted: boolean;
+
+        generateHandle(): void;
+        bind(target?: GLenum, check?: boolean): void;
+        check(target?: GLenum): boolean;
+        applyViewport(): void;
+        attachColorTexture(index: number, texture: Texture): void;
+        attachColorTextureLayer(
+            index: number,
+            texture: Texture,
+            layer: number
+        ): void;
+        attachColorCubemapFace(
+            index: number,
+            cubemap: Cubemap,
+            face: CubemapFaceID
+        ): void;
+        attachColorRenderbuffer(
+            index: number,
+            renderbuffer: Renderbuffer
+        ): void;
+        attachDepthTexture(texture: Texture): void;
+        attachDepthCubemapFace(cubemap: Cubemap, face: CubemapFaceID): void;
+        attachDepthRenderbuffer(renderbuffer: Renderbuffer): void;
+        attachStencilTexture(texture: Texture): void;
+        attachStencilRenderbuffer(renderbuffer: Renderbuffer): void;
+        attachDepthStencilTexture(texture: Texture): void;
+        attachDepthStencilRenderbuffer(renderbuffer: Renderbuffer): void;
+        delete(): void;
+    }
+
+    export interface DefaultFramebuffer {
+        width: number;
+        height: number;
+        applyViewport(): void;
+        bind(target?: GLenum): void;
     }
 
     export type RenderFunction = (
@@ -243,11 +394,38 @@ declare namespace WebGLWrapper {
         samplingProperties?: SamplingProperties;
     }
 
+    export interface MakeCubemapOptions {
+        width: number;
+        height: number;
+        pixelFormat?: PixelFormat;
+        samplingProperties?: SamplingProperties;
+    }
+
     export interface MakeSamplerOptions {
         properties?: SamplingProperties;
     }
 
+    export interface MakeRenderbufferOptions {
+        width: number;
+        height: number;
+        internalFormat: GLenum;
+    }
+
+    export interface MakeGeneratedRenderbuffersOptions {
+        generateDepthRenderbuffer?: boolean;
+        generateStencilRenderbuffer?: boolean;
+        generateDepthStencilRenderbuffer?: boolean;
+    }
+
+    export interface MakeFramebufferOptions {
+        width: number;
+        height: number;
+        generatedRenderbuffers?: MakeGeneratedRenderbuffersOptions;
+    }
+
     export class WebGLWrapper {
+        defaultFramebuffer: DefaultFramebuffer;
+
         constructor(canvasSelector: string, options?: WebGLWrapperOptions);
         start(): void;
 
@@ -265,12 +443,16 @@ declare namespace WebGLWrapper {
         make2DTexture(options: Make2DTextureOptions): Texture;
         make3DTexture(options: Make3DTextureOptions): Texture;
         makeSampler(options: MakeSamplerOptions): Sampler;
+        makeCubemap(options: MakeCubemapOptions): Cubemap;
+        makeRenderbuffer(options: MakeRenderbufferOptions): Renderbuffer;
+        makeFramebuffer(options: MakeFramebufferOptions): Framebuffer;
     }
 }
 
 declare global {
     export class GLUtil {
         nameOfGLEnum(v: GLenum): string;
+        cubemapFaceIDValue(faceID: WebGLWrapper.CubemapFaceID): GLenum;
     }
 
     interface Window {

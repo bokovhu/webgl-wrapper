@@ -4,7 +4,7 @@
         "target": "es5",
         "allowJs": true,
         "noImplicitAny": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node""
     },
     "exclude": [
         "./node_modules/"
