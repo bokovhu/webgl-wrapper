@@ -1,0 +1,24 @@
+{
+    "name": "@me.bokov/webgl-wrapper",
+    "version": "0.0.2",
+    "description": "A simple wrapper for WebGL",
+    "main": "dist/wglw.js",
+    "types": "@types/webgl-wrapper/index.d.ts",
+    "scripts": {
+        "wglw:build": "webpack --mode production --config webpack.config.js",
+        "wglw:build-dev": "webpack --mode development --config webpack.config.js"
+    },
+    "devDependencies": {
+        "ts-loader": "^8.0.18",
+        "typescript": "^4.2.3",
+        "webpack": "^5.25.0",
+        "webpack-cli": "^4.5.0"
+    },
+    "dependencies": {
+        "gl-matrix": "^3.3.0"
+    },
+    "files": [
+        "types/**",
+        "dist/*"
+    ]
+}

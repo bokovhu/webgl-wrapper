@@ -1,0 +1,56 @@
+import { Texture, Cubemap, CubemapFaceID } from "./types";
+export declare class Renderbuffer {
+    gl: WebGL2RenderingContext;
+    private _width;
+    private _height;
+    private _internalFormat;
+    private _handle;
+    private _handleGenerated;
+    private _storageGenerated;
+    private _isDeleted;
+    constructor(gl: WebGL2RenderingContext, _width: number, _height: number, _internalFormat: GLenum);
+    get handle(): WebGLRenderbuffer;
+    get width(): number;
+    get height(): number;
+    get internalFormat(): GLenum;
+    get handleGenerated(): boolean;
+    get storageGenerated(): boolean;
+    get isDeleted(): boolean;
+    generateHandle(): void;
+    generateStorage(internalFormat?: GLenum | null): void;
+    bind(): void;
+    delete(): void;
+}
+export declare class Framebuffer {
+    gl: WebGL2RenderingContext;
+    private _width;
+    private _height;
+    private _handle;
+    private _handleGenerated;
+    private _isComplete;
+    private _isDeleted;
+    constructor(gl: WebGL2RenderingContext, _width: number, _height: number);
+    get handle(): WebGLFramebuffer;
+    get width(): number;
+    get height(): number;
+    get handleGenerated(): boolean;
+    get isComplete(): boolean;
+    get isDeleted(): boolean;
+    generateHandle(): void;
+    bind(target?: GLenum, check?: boolean): void;
+    check(target: GLenum): boolean;
+    applyViewport(): void;
+    private beforeAttach;
+    attachColorTexture(index: number, texture: Texture): void;
+    attachColorTextureLayer(index: number, texture: Texture, layer: number): void;
+    attachColorCubemapFace(index: number, cubemap: Cubemap, face: CubemapFaceID): void;
+    attachColorRenderbuffer(index: number, renderbuffer: Renderbuffer): void;
+    attachDepthTexture(texture: Texture): void;
+    attachDepthCubemapFace(cubemap: Cubemap, face: CubemapFaceID): void;
+    attachDepthRenderbuffer(renderbuffer: Renderbuffer): void;
+    attachStencilTexture(texture: Texture): void;
+    attachStencilRenderbuffer(renderbuffer: Renderbuffer): void;
+    attachDepthStencilTexture(texture: Texture): void;
+    attachDepthStencilRenderbuffer(renderbuffer: Renderbuffer): void;
+    delete(): void;
+}
