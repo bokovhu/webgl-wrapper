@@ -1,31 +1,30 @@
-import { Shader } from "./index";
-import type {
-    VertexAttributeMapType,
+import {
     UniformInfoMapType,
     UniformSetterMapType,
-    VertexAttributeLocationMapType
-} from "./types";
+    VertexAttributeLocationMapType,
+    VertexAttributeMapType,
+} from "../types";
+import { Shader } from "./Shader";
 import {
     AbstractUniformSetter,
-    FloatUniformSetter,
     Float2UniformSetter,
     Float3UniformSetter,
     Float4UniformSetter,
-    IntUniformSetter,
+    FloatUniformSetter,
     Int2UniformSetter,
     Int3UniformSetter,
     Int4UniformSetter,
-    UintUniformSetter,
-    Uint2UniformSetter,
-    Uint3UniformSetter,
-    Uint4UniformSetter,
+    IntUniformSetter,
     Mat2UniformSetter,
     Mat3UniformSetter,
     Mat4UniformSetter,
-    UniformArrayElementDescriptor
+    Uint2UniformSetter,
+    Uint3UniformSetter,
+    Uint4UniformSetter,
+    UintUniformSetter,
 } from "./uniformSetters";
 
-export default class Program {
+export class Program {
     private _handle: WebGLProgram;
     private _vertexShader: Shader = null;
     private _fragmentShader: Shader = null;

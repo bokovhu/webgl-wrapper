@@ -1,5 +1,5 @@
-import { SamplingProperties } from "./types";
-export default class Sampler {
+import { SamplingProperties } from "./SamplingProperties";
+export declare class Sampler {
     gl: WebGL2RenderingContext;
     private _properties;
     private static DEFAULT_SAMPLING_PROPERTIES;

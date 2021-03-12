@@ -1,26 +1,92 @@
-import {
-    WebGLWrapperOptions,
-    RenderFunction,
-    MakeMeshOptions,
-    InitFunction,
-    MakeTextureOptions,
-    Make2DTextureOptions,
-    Make3DTextureOptions,
-    MakeSamplerOptions,
-    DefaultFramebuffer,
-    MakeCubemapOptions,
-    Cubemap,
-    MakeRenderbufferOptions,
-    MakeFramebufferOptions
-} from "./types";
-import Shader from "./shader";
-import Program from "./program";
-import Mesh from "./mesh";
-import Texture from "./texture";
-import Sampler from "./sampler";
-import { Renderbuffer, Framebuffer } from "./framebuffer";
+import { DefaultFramebuffer, Framebuffer, Renderbuffer } from "./fbo";
+import { Mesh, VertexAttribute } from "./mesh";
+import { Program, Shader } from "./shader";
+import { PixelFormat, Sampler, SamplingProperties, Texture } from "./texture";
 
-class DefaultFramebufferImpl {
+export type RenderFunction = (
+    delta: number,
+    gl: WebGL2RenderingContext,
+    ww?: WebGLWrapper
+) => void;
+
+export type InitFunction = (
+    gl: WebGL2RenderingContext,
+    ww?: WebGLWrapper
+) => void;
+
+export interface WebGLExtensionOptions {
+    colorBufferFloat?: boolean | null;
+    textureFloatLinear?: boolean | null;
+    elementIndexUint?: boolean | null;
+}
+
+export interface WebGLWrapperOptions {
+    onInit?: InitFunction | null;
+    onRender?: RenderFunction | null;
+    resizeCanvasToFitWindow?: boolean;
+    extensions?: WebGLExtensionOptions | null;
+}
+
+export interface MakeMeshOptions {
+    attributes: VertexAttribute[];
+    primitive: GLenum;
+    indexed: boolean;
+}
+
+export interface MakeTextureOptions {
+    width: number;
+    height: number;
+    depth?: number;
+    target: GLenum;
+    pixelFormat?: PixelFormat;
+    samplingProperties?: SamplingProperties;
+}
+
+export interface Make2DTextureOptions {
+    width: number;
+    height: number;
+    pixelFormat?: PixelFormat;
+    samplingProperties?: SamplingProperties;
+}
+
+export interface Make3DTextureOptions {
+    width: number;
+    height: number;
+    depth: number;
+    pixelFormat?: PixelFormat;
+    samplingProperties?: SamplingProperties;
+}
+
+export interface MakeCubemapOptions {
+    width: number;
+    height: number;
+    pixelFormat?: PixelFormat;
+    samplingProperties?: SamplingProperties;
+}
+
+export interface MakeSamplerOptions {
+    properties?: SamplingProperties;
+}
+
+export interface MakeRenderbufferOptions {
+    width: number;
+    height: number;
+    internalFormat: GLenum;
+}
+
+export interface MakeGeneratedRenderbuffersOptions {
+    generateDepthRenderbuffer?: boolean;
+    generateStencilRenderbuffer?: boolean;
+    generateDepthStencilRenderbuffer?: boolean;
+}
+
+export interface MakeFramebufferOptions {
+    width: number;
+    height: number;
+    generatedRenderbuffers?: MakeGeneratedRenderbuffersOptions;
+}
+
+class DefaultFramebufferImpl implements DefaultFramebuffer {
     constructor(
         private gl: WebGL2RenderingContext,
         private canvas: HTMLCanvasElement
@@ -41,7 +107,7 @@ class DefaultFramebufferImpl {
     }
 }
 
-export default class WebGLWrapper {
+export class WebGLWrapper {
     private _onInit: InitFunction = null;
     private _onRender: RenderFunction = null;
 
@@ -95,7 +161,7 @@ export default class WebGLWrapper {
     private resizeCanvas(): void {
         this.resolution = [
             document.body.clientWidth,
-            document.body.clientHeight
+            document.body.clientHeight,
         ];
 
         this._canvas.width = this.resolution[0];
@@ -269,11 +335,6 @@ export default class WebGLWrapper {
         return samp;
     }
 
-    makeCubemap(options: MakeCubemapOptions): Cubemap {
-        // TODO: Cubemap support
-        throw new Error("Cubemaps are not yet supported");
-    }
-
     makeRenderbuffer(options: MakeRenderbufferOptions): Renderbuffer {
         let rb = new Renderbuffer(
             this._glContext,
@@ -303,7 +364,7 @@ export default class WebGLWrapper {
                 let rb = this.makeRenderbuffer({
                     width: options.width,
                     height: options.height,
-                    internalFormat: this._glContext.DEPTH_STENCIL
+                    internalFormat: this._glContext.DEPTH_STENCIL,
                 });
                 fb.attachDepthStencilRenderbuffer(rb);
             } else {
@@ -311,7 +372,7 @@ export default class WebGLWrapper {
                     let rb = this.makeRenderbuffer({
                         width: options.width,
                         height: options.height,
-                        internalFormat: this._glContext.DEPTH_COMPONENT16
+                        internalFormat: this._glContext.DEPTH_COMPONENT16,
                     });
                     fb.attachDepthRenderbuffer(rb);
                 }
@@ -322,7 +383,7 @@ export default class WebGLWrapper {
                     let rb = this.makeRenderbuffer({
                         width: options.width,
                         height: options.height,
-                        internalFormat: this._glContext.STENCIL_INDEX8
+                        internalFormat: this._glContext.STENCIL_INDEX8,
                     });
                     fb.attachStencilRenderbuffer(rb);
                 }

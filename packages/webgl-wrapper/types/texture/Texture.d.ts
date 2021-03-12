@@ -1,5 +1,6 @@
-import { PixelFormat, SamplingProperties } from "./types";
-export default class Texture {
+import { PixelFormat } from "./PixelFormat";
+import { SamplingProperties } from "./SamplingProperties";
+export declare class Texture {
     gl: WebGL2RenderingContext;
     private _target;
     private _pixelFormat;

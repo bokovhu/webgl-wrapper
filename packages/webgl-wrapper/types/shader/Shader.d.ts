@@ -1,4 +1,4 @@
-export default class Shader {
+export declare class Shader {
     gl: WebGL2RenderingContext;
     private _handle;
     private _type;

@@ -1,100 +1,6 @@
-import { Texture, Cubemap, CubemapFaceID } from "./types";
-import glUtil from "./glUtil";
-
-export class Renderbuffer {
-    private _handle: WebGLRenderbuffer;
-    private _handleGenerated: boolean = false;
-    private _storageGenerated: boolean = false;
-    private _isDeleted: boolean = false;
-
-    constructor(
-        public gl: WebGL2RenderingContext,
-        private _width: number,
-        private _height: number,
-        private _internalFormat: GLenum
-    ) {}
-
-    get handle(): WebGLRenderbuffer {
-        return this._handle;
-    }
-    get width(): number {
-        return this._width;
-    }
-    get height(): number {
-        return this._height;
-    }
-    get internalFormat(): GLenum {
-        return this._internalFormat;
-    }
-    get handleGenerated(): boolean {
-        return this._handleGenerated;
-    }
-    get storageGenerated(): boolean {
-        return this._storageGenerated;
-    }
-    get isDeleted(): boolean {
-        return this._isDeleted;
-    }
-
-    generateHandle(): void {
-        if (this._isDeleted) {
-            throw new Error("Renderbuffer has been deleted");
-        }
-        if (this._handleGenerated) {
-            throw new Error("Renderbuffer handle has already been generated");
-        }
-        this._handle = this.gl.createRenderbuffer();
-        this._handleGenerated = true;
-    }
-    generateStorage(internalFormat: GLenum | null = null): void {
-        if (this._isDeleted) {
-            throw new Error("Renderbuffer has been deleted");
-        }
-        if (this._storageGenerated) {
-            throw new Error("Renderbuffer storage has already been generated");
-        }
-
-        if (!this._handleGenerated) {
-            this.generateHandle();
-        }
-        if (internalFormat != null) {
-            this._internalFormat = internalFormat;
-        }
-        this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this._handle);
-        this.gl.renderbufferStorage(
-            this.gl.RENDERBUFFER,
-            this._internalFormat,
-            this._width,
-            this._height
-        );
-        this._storageGenerated = true;
-    }
-    bind(): void {
-        if (this._isDeleted) {
-            throw new Error("Renderbuffer has been deleted");
-        }
-        if (!this._handleGenerated) {
-            this.generateHandle();
-        }
-        if (!this._storageGenerated) {
-            this.generateStorage();
-        }
-        this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this._handle);
-    }
-    delete(): void {
-        if (this._isDeleted) {
-            throw new Error("Renderbuffer has already been deleted");
-        }
-        if (!this._handleGenerated) {
-            throw new Error(
-                "Cannot delete renderbuffer before it has been generated"
-            );
-        }
-
-        this.gl.deleteRenderbuffer(this._handle);
-        this._isDeleted = true;
-    }
-}
+import { Texture } from "../texture";
+import { glUtil } from "../util";
+import { Renderbuffer } from "./Renderbuffer";
 
 export class Framebuffer {
     private _handle: WebGLFramebuffer;
@@ -225,22 +131,6 @@ export class Framebuffer {
         );
     }
 
-    attachColorCubemapFace(
-        index: number,
-        cubemap: Cubemap,
-        face: CubemapFaceID
-    ): void {
-        this.beforeAttach();
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferTexture2D(
-            this.gl.FRAMEBUFFER,
-            this.gl.COLOR_ATTACHMENT0 + index,
-            glUtil.cubemapFaceIDValue(face),
-            cubemap.handle,
-            0
-        );
-    }
-
     attachColorRenderbuffer(index: number, renderbuffer: Renderbuffer): void {
         this.beforeAttach();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
@@ -259,7 +149,7 @@ export class Framebuffer {
         }
         // TODO: Check texture format and datatype
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferTexture2D (
+        this.gl.framebufferTexture2D(
             this.gl.FRAMEBUFFER,
             this.gl.DEPTH_ATTACHMENT,
             texture.target,
@@ -268,23 +158,11 @@ export class Framebuffer {
         );
     }
 
-    attachDepthCubemapFace (cubemap: Cubemap, face: CubemapFaceID): void {
-        this.beforeAttach ();
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferTexture2D (
-            this.gl.FRAMEBUFFER,
-            this.gl.DEPTH_ATTACHMENT,
-            glUtil.cubemapFaceIDValue(face),
-            cubemap.handle,
-            0
-        );
-    }
-
-    attachDepthRenderbuffer (renderbuffer: Renderbuffer): void {
-        this.beforeAttach ();
+    attachDepthRenderbuffer(renderbuffer: Renderbuffer): void {
+        this.beforeAttach();
         // TODO: Check renderbuffer internal format
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferRenderbuffer (
+        this.gl.framebufferRenderbuffer(
             this.gl.FRAMEBUFFER,
             this.gl.DEPTH_ATTACHMENT,
             this.gl.RENDERBUFFER,
@@ -292,10 +170,10 @@ export class Framebuffer {
         );
     }
 
-    attachStencilTexture (texture: Texture): void {
-        this.beforeAttach ();
+    attachStencilTexture(texture: Texture): void {
+        this.beforeAttach();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferTexture2D (
+        this.gl.framebufferTexture2D(
             this.gl.FRAMEBUFFER,
             this.gl.STENCIL_ATTACHMENT,
             texture.target,
@@ -304,11 +182,11 @@ export class Framebuffer {
         );
     }
 
-    attachStencilRenderbuffer (renderbuffer: Renderbuffer): void {
-        this.beforeAttach ();
+    attachStencilRenderbuffer(renderbuffer: Renderbuffer): void {
+        this.beforeAttach();
         // TODO: Check renderbuffer internal format
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferRenderbuffer (
+        this.gl.framebufferRenderbuffer(
             this.gl.FRAMEBUFFER,
             this.gl.STENCIL_ATTACHMENT,
             this.gl.RENDERBUFFER,
@@ -316,10 +194,10 @@ export class Framebuffer {
         );
     }
 
-    attachDepthStencilTexture (texture: Texture): void {
-        this.beforeAttach ();
+    attachDepthStencilTexture(texture: Texture): void {
+        this.beforeAttach();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferTexture2D (
+        this.gl.framebufferTexture2D(
             this.gl.FRAMEBUFFER,
             this.gl.DEPTH_STENCIL_ATTACHMENT,
             texture.target,
@@ -328,11 +206,11 @@ export class Framebuffer {
         );
     }
 
-    attachDepthStencilRenderbuffer (renderbuffer: Renderbuffer): void {
-        this.beforeAttach ();
+    attachDepthStencilRenderbuffer(renderbuffer: Renderbuffer): void {
+        this.beforeAttach();
         // TODO: Check renderbuffer internal format
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this._handle);
-        this.gl.framebufferRenderbuffer (
+        this.gl.framebufferRenderbuffer(
             this.gl.FRAMEBUFFER,
             this.gl.DEPTH_STENCIL_ATTACHMENT,
             this.gl.RENDERBUFFER,

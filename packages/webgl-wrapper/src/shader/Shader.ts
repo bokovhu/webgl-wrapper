@@ -1,4 +1,4 @@
-export default class Shader {
+export class Shader {
     private _handle: WebGLShader;
     private _type: GLenum;
     private _source: string;

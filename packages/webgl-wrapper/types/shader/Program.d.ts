@@ -1,6 +1,6 @@
-import { Shader } from "./index";
-import type { VertexAttributeMapType, UniformInfoMapType, UniformSetterMapType, VertexAttributeLocationMapType } from "./types";
-export default class Program {
+import { UniformInfoMapType, UniformSetterMapType, VertexAttributeLocationMapType, VertexAttributeMapType } from "../types";
+import { Shader } from "./Shader";
+export declare class Program {
     gl: WebGL2RenderingContext;
     private _handle;
     private _vertexShader;

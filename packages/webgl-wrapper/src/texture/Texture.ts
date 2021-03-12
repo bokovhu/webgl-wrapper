@@ -1,11 +1,12 @@
-import { PixelFormat, SamplingProperties } from "./types";
-import glUtil from "./glUtil";
+import { glUtil } from "../util";
+import { PixelFormat } from "./PixelFormat";
+import { SamplingProperties } from "./SamplingProperties";
 
-export default class Texture {
+export class Texture {
     private static DEFAULT_PIXEL_FORMAT: PixelFormat = {
         format: WebGL2RenderingContext.RGBA,
         internalFormat: WebGL2RenderingContext.RGBA8,
-        dataType: WebGL2RenderingContext.UNSIGNED_BYTE
+        dataType: WebGL2RenderingContext.UNSIGNED_BYTE,
     };
 
     private static DEFAULT_SAMPLING_PROPERTIES: SamplingProperties = {
@@ -13,19 +14,19 @@ export default class Texture {
         magFilter: WebGL2RenderingContext.NEAREST,
         wrapS: WebGL2RenderingContext.CLAMP_TO_EDGE,
         wrapT: WebGL2RenderingContext.CLAMP_TO_EDGE,
-        wrapR: WebGL2RenderingContext.CLAMP_TO_EDGE
+        wrapR: WebGL2RenderingContext.CLAMP_TO_EDGE,
     };
 
     private static VALID_TARGETS: GLenum[] = [
         WebGL2RenderingContext.TEXTURE_2D,
-        WebGL2RenderingContext.TEXTURE_3D
+        WebGL2RenderingContext.TEXTURE_3D,
     ];
 
     private static TWO_DIMENSIONAL_TARGETS: GLenum[] = [
-        WebGL2RenderingContext.TEXTURE_2D
+        WebGL2RenderingContext.TEXTURE_2D,
     ];
     private static THREE_DIMENSIONAL_TARGETS: GLenum[] = [
-        WebGL2RenderingContext.TEXTURE_3D
+        WebGL2RenderingContext.TEXTURE_3D,
     ];
 
     private _handle: WebGLTexture;

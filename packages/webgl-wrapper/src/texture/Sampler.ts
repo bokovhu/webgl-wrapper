@@ -1,12 +1,12 @@
-import { SamplingProperties } from "./types";
+import { SamplingProperties } from "./SamplingProperties";
 
-export default class Sampler {
+export class Sampler {
     private static DEFAULT_SAMPLING_PROPERTIES: SamplingProperties = {
         minFilter: WebGL2RenderingContext.NEAREST,
         magFilter: WebGL2RenderingContext.NEAREST,
         wrapS: WebGL2RenderingContext.CLAMP_TO_EDGE,
         wrapT: WebGL2RenderingContext.CLAMP_TO_EDGE,
-        wrapR: WebGL2RenderingContext.CLAMP_TO_EDGE
+        wrapR: WebGL2RenderingContext.CLAMP_TO_EDGE,
     };
 
     private _handle: WebGLSampler;

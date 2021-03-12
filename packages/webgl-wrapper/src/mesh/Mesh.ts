@@ -1,6 +1,7 @@
-import { VertexAttribute, VertexDataType } from "./types";
+import { VertexDataType } from "../types";
+import { VertexAttribute } from "./VertexAttribute";
 
-export default class Mesh {
+export class Mesh {
     private _vao: WebGLVertexArrayObject;
     private _vbo: WebGLBuffer;
     private _ibo: WebGLBuffer;

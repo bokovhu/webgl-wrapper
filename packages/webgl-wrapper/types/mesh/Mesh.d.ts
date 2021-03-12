@@ -1,5 +1,6 @@
-import { VertexAttribute, VertexDataType } from "./types";
-export default class Mesh {
+import { VertexDataType } from "../types";
+import { VertexAttribute } from "./VertexAttribute";
+export declare class Mesh {
     gl: WebGL2RenderingContext;
     private _vao;
     private _vbo;

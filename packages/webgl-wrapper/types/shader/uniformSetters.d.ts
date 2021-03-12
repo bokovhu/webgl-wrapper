@@ -1,5 +1,5 @@
-import { Program } from "./types";
 import { vec2, vec3, vec4, mat2, mat3, mat4 } from "gl-matrix";
+import { Program } from "./Program";
 export declare abstract class AbstractUniformSetter<T> {
     gl: WebGL2RenderingContext;
     protected _uniformName: string;
