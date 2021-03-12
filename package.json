@@ -5,6 +5,12 @@
     "workspaces": [
         "packages/*"
     ],
+    "main": "dist/wglw.js",
+    "types": "./types/index.d.ts",
+    "files": [
+        "dist/**",
+        "types/**"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/bokovhu/webgl-wrapper.git"
@@ -18,6 +24,10 @@
         "url": "https://github.com/bokovhu/webgl-wrapper/issues"
     },
     "devDependencies": {
+        "shelljs": "^0.8.4",
         "typescript": "^4.2.3"
+    },
+    "scripts": {
+        "root:build": "yarn wglw:build && node scripts/copy-dist.js"
     }
 }
