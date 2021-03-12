@@ -3,7 +3,7 @@
     "version": "0.0.2",
     "description": "A simple wrapper for WebGL",
     "main": "dist/wglw.js",
-    "types": "@types/webgl-wrapper/index.d.ts",
+    "types": "./types/index.d.ts",
     "scripts": {
         "wglw:build": "webpack --mode production --config webpack.config.js",
         "wglw:build-dev": "webpack --mode development --config webpack.config.js"
